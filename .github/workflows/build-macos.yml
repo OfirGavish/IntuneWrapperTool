@@ -21,7 +21,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x'
+        dotnet-version: '8.0.404'
         global-json-file: global.json
     
     - name: Install MAUI workload
@@ -31,14 +31,14 @@ jobs:
       run: dotnet restore IntuneWrapperTool.csproj
     
     - name: Build for macOS
-      run: dotnet build IntuneWrapperTool.csproj -c Release -f net10.0-maccatalyst
+      run: dotnet build IntuneWrapperTool.csproj -c Release -f net8.0-maccatalyst
     
     - name: Publish macOS Universal (Intel + Apple Silicon)
       run: |
         # Build for both architectures
         dotnet publish IntuneWrapperTool.csproj \
           -c Release \
-          -f net10.0-maccatalyst \
+          -f net8.0-maccatalyst \
           -p:CreatePackage=true \
           -p:RuntimeIdentifiers=maccatalyst-x64;maccatalyst-arm64
     
@@ -47,7 +47,7 @@ jobs:
         mkdir -p dist-macos
         
         # Find and copy the .app bundle
-        find bin/Release/net10.0-maccatalyst -name "*.app" -type d -exec cp -R {} dist-macos/ \;
+        find bin/Release/net8.0-maccatalyst -name "*.app" -type d -exec cp -R {} dist-macos/ \;
         
         # Create README
         cat > dist-macos/README.txt << 'EOF'

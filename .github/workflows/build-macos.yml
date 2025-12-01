@@ -33,14 +33,21 @@ jobs:
     - name: Build for macOS
       run: dotnet build IntuneWrapperTool.csproj -c Release -f net8.0-maccatalyst
     
-    - name: Publish macOS Universal (Intel + Apple Silicon)
+    - name: Publish macOS Intel
       run: |
-        # Build for both architectures
         dotnet publish IntuneWrapperTool.csproj \
           -c Release \
           -f net8.0-maccatalyst \
-          -p:CreatePackage=true \
-          -p:RuntimeIdentifiers=maccatalyst-x64;maccatalyst-arm64
+          -r maccatalyst-x64 \
+          --self-contained
+    
+    - name: Publish macOS Apple Silicon
+      run: |
+        dotnet publish IntuneWrapperTool.csproj \
+          -c Release \
+          -f net8.0-maccatalyst \
+          -r maccatalyst-arm64 \
+          --self-contained
     
     - name: Create distribution package
       run: |

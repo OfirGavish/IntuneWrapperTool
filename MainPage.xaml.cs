@@ -386,7 +386,7 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async Task VerifyWrappedIpaAsync()
+    private Task VerifyWrappedIpaAsync()
     {
         try
         {
@@ -418,6 +418,8 @@ public partial class MainPage : ContentPage
         {
             LogMessage($"Verification error: {ex.Message}");
         }
+        
+        return Task.CompletedTask;
     }
 
     private void UpdateStatus(string message, double progress)

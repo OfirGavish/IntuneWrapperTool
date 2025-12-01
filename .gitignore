@@ -1,0 +1,18 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+
+## MAUI
+.vs/
+.vscode/
+
+## macOS
+.DS_Store
+*.app
+
+## Publish
+dist-*/
+*.zip

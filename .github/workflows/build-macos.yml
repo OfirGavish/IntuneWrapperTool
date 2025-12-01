@@ -1,0 +1,94 @@
+name: Build macOS Intune Wrapper Tool
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build-macos:
+    name: Build for macOS (Intel + Apple Silicon)
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Install MAUI workload
+      run: dotnet workload install maui
+    
+    - name: Restore dependencies
+      run: dotnet restore IntuneWrapperTool.csproj
+    
+    - name: Build for macOS
+      run: dotnet build IntuneWrapperTool.csproj -c Release -f net8.0-maccatalyst
+    
+    - name: Publish macOS Universal (Intel + Apple Silicon)
+      run: |
+        # Build for both architectures
+        dotnet publish IntuneWrapperTool.csproj \
+          -c Release \
+          -f net8.0-maccatalyst \
+          -p:CreatePackage=true \
+          -p:RuntimeIdentifiers=maccatalyst-x64;maccatalyst-arm64
+    
+    - name: Create distribution package
+      run: |
+        mkdir -p dist-macos
+        
+        # Find and copy the .app bundle
+        find bin/Release/net8.0-maccatalyst -name "*.app" -type d -exec cp -R {} dist-macos/ \;
+        
+        # Create README
+        cat > dist-macos/README.txt << 'EOF'
+        Intune Wrapper Tool for macOS
+        ==============================
+        
+        Installation:
+        1. Copy IntuneWrapperTool.app to your Applications folder
+        2. Right-click and select "Open" (first time only, due to Gatekeeper)
+        3. Download Intune App Wrapping Tool from:
+           https://github.com/msintuneappsdk/intune-app-wrapping-tool-ios
+        4. Extract to /Applications/IntuneMAMPackager/
+        
+        Usage:
+        1. Launch IntuneWrapperTool
+        2. Select your .ipa file
+        3. Select provisioning profile
+        4. Click "Wrap App"
+        5. Deploy wrapped IPA to Intune
+        
+        Requirements:
+        - macOS 13.1 or later
+        - Xcode installed
+        - Apple Developer account
+        
+        Support: https://github.com/OfirGavish/IntuneWrapperTool
+        EOF
+        
+        # Create zip
+        cd dist-macos && zip -r ../IntuneWrapperTool-macOS.zip . && cd ..
+    
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: IntuneWrapperTool-macOS
+        path: IntuneWrapperTool-macOS.zip
+        retention-days: 90
+    
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: IntuneWrapperTool-macOS.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

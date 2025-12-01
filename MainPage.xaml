@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IntuneWrapperTool.MainPage"
+             Title="Intune App Wrapper Tool"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,20" Spacing="20">
+            
+            <!-- Header -->
+            <Border Padding="20" BackgroundColor="#0078D4" StrokeThickness="0">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📦 Microsoft Intune App Wrapper" 
+                           FontSize="24" 
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Easily wrap iOS apps for Intune management" 
+                           FontSize="14"
+                           TextColor="White"
+                           HorizontalOptions="Center"/>
+                    <Label Text="⚠️ Meets January 19, 2026 deadline requirement" 
+                           FontSize="12"
+                           TextColor="#FFD700"
+                           HorizontalOptions="Center"
+                           FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Step 1: Input IPA -->
+            <Border Padding="20" Stroke="#E0E0E0" StrokeThickness="1">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="1️⃣ Select Input IPA File" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <Label Text="Choose the iOS .ipa file you want to wrap" 
+                           FontSize="12" 
+                           TextColor="Gray"/>
+                    <Entry x:Name="InputIpaPath" 
+                           Placeholder="C:\path\to\your-app.ipa"
+                           IsReadOnly="True"
+                           FontSize="12"/>
+                    <Button Text="📁 Browse for IPA File" 
+                            Clicked="OnBrowseInputIpa"
+                            BackgroundColor="#0078D4"
+                            TextColor="White"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Step 2: Provisioning Profile -->
+            <Border Padding="20" Stroke="#E0E0E0" StrokeThickness="1">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="2️⃣ Select Provisioning Profile" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <Label Text="Choose your .mobileprovision file" 
+                           FontSize="12" 
+                           TextColor="Gray"/>
+                    <Entry x:Name="ProvisioningProfilePath" 
+                           Placeholder="C:\path\to\profile.mobileprovision"
+                           IsReadOnly="True"
+                           FontSize="12"/>
+                    <Button Text="📁 Browse for Provisioning Profile" 
+                            Clicked="OnBrowseProvisioningProfile"
+                            BackgroundColor="#0078D4"
+                            TextColor="White"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Step 3: Signing Identity -->
+            <Border Padding="20" Stroke="#E0E0E0" StrokeThickness="1">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="3️⃣ Signing Identity (Optional)" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <Label Text="Enter your signing identity or leave blank for auto-detection" 
+                           FontSize="12" 
+                           TextColor="Gray"/>
+                    <Entry x:Name="SigningIdentity" 
+                           Placeholder="iPhone Distribution: Your Company (TEAMID)"
+                           FontSize="12"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Step 4: Output Location -->
+            <Border Padding="20" Stroke="#E0E0E0" StrokeThickness="1">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="4️⃣ Output Location" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <Label Text="Choose where to save the wrapped IPA" 
+                           FontSize="12" 
+                           TextColor="Gray"/>
+                    <Entry x:Name="OutputIpaPath" 
+                           Placeholder="C:\path\to\output\wrapped-app.ipa"
+                           IsReadOnly="True"
+                           FontSize="12"/>
+                    <Button Text="📁 Choose Output Location" 
+                            Clicked="OnBrowseOutputIpa"
+                            BackgroundColor="#0078D4"
+                            TextColor="White"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Advanced Options -->
+            <Border Padding="20" Stroke="#E0E0E0" StrokeThickness="1">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="⚙️ Advanced Options" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <HorizontalStackLayout Spacing="10">
+                        <CheckBox x:Name="VerboseLogging" IsChecked="True"/>
+                        <Label Text="Enable verbose logging" 
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="10">
+                        <CheckBox x:Name="VerifyAfterWrap" IsChecked="True"/>
+                        <Label Text="Verify wrapped IPA after completion" 
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="🚀 Wrap App" 
+                        Clicked="OnWrapApp"
+                        BackgroundColor="#107C10"
+                        TextColor="White"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        HeightRequest="50"/>
+                <Button Grid.Column="1"
+                        Text="🔄 Reset" 
+                        Clicked="OnReset"
+                        BackgroundColor="#D13438"
+                        TextColor="White"
+                        FontSize="16"
+                        HeightRequest="50"/>
+            </Grid>
+
+            <!-- Progress Section -->
+            <Border x:Name="ProgressSection" 
+                    Padding="20" 
+                    Stroke="#E0E0E0" 
+                    StrokeThickness="1"
+                    IsVisible="False">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="📊 Progress" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <ProgressBar x:Name="ProgressBar" Progress="0"/>
+                    <Label x:Name="StatusLabel" 
+                           Text="Ready to wrap..." 
+                           FontSize="12"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Log Output -->
+            <Border x:Name="LogSection" 
+                    Padding="20" 
+                    Stroke="#E0E0E0" 
+                    StrokeThickness="1"
+                    IsVisible="False">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📝 Log Output" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <ScrollView HeightRequest="200">
+                        <Label x:Name="LogOutput" 
+                               FontFamily="Courier New"
+                               FontSize="10"
+                               LineBreakMode="WordWrap"/>
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Help Section -->
+            <Border Padding="20" BackgroundColor="#F0F0F0" StrokeThickness="0">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="ℹ️ Need Help?" 
+                           FontSize="16" 
+                           FontAttributes="Bold"/>
+                    <Label Text="• Input IPA: The iOS app file you want to wrap" 
+                           FontSize="12"/>
+                    <Label Text="• Provisioning Profile: Distribution .mobileprovision from Apple Developer" 
+                           FontSize="12"/>
+                    <Label Text="• Signing Identity: Your Apple Distribution certificate name" 
+                           FontSize="12"/>
+                    <Label Text="• This tool uses Microsoft Intune App Wrapping Tool v20.8.0+" 
+                           FontSize="12"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
